@@ -19,7 +19,7 @@ The installation of the package is straight forward. Make sure to source `setup.
 ```
 cd ~/path/to/your/workspace/src
 git clone https://github.com/arplaboratory/ROS-RC-Wrapper.git
-catkin build
+catkin build rc_control
 source ~/path/to/your/workspace/devel/setup.bash 
 ```
 # Running
