@@ -38,13 +38,13 @@ To send body velocity goals using the RC follow these steps,
 ## Takeoff
 1. After motors-on is clicked, toggle `SWITCH F` on the RC to `POS 1` to switch to "Offboard" mode.
 2. Toggle `SWITCH D` to `POS 1` to takeoff.
-> **Note:**
+> [!NOTE]
 > At this point the robot will be flying and will be in offboard mode as usual.
 
 ## Velocity Control
 
 1. Toggle `SWITCH F` to `POS 0` to enable velocity control. 
-> **Important:**
+> [!IMPORTANT]
 > Make sure both the sticks are centered before toggling to Velocity mode to avoid publishing any unnecesary goals during transition.
 
 ## Landing
@@ -57,3 +57,7 @@ To send body velocity goals using the RC follow these steps,
 
 > [!WARNING]
 > Make sure the **THROTTLE STICK** is set to **ZERO** before switching mode to stabilize. This is to avoid commanding high throttle during disarming.
+
+## Image for reference
+![RC drawio](https://github.com/arplaboratory/ROS-RC-Wrapper/assets/105642404/f7382204-6ed1-4672-a88a-9ef1742e1aa8)
+
