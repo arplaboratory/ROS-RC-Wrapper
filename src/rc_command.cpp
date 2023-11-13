@@ -21,6 +21,7 @@ class command
         uint16_t rc_channels[8];
         double rc_mins[4];
         double rc_max[4];
+        bool gotCalibration;
 
         //Callback function Prototypes
         void rc_in_cb_(const mavros_msgs::RCIn::ConstPtr& msg);
@@ -46,7 +47,7 @@ command::command()
     rc_channels[8] ={0};
     rc_mins[4] = {0};
     rc_max[4] = {0};
-    bool success = get_RC_Calibration();
+    gotCalibration = get_RC_Calibration();
     //motors = false;
 }
 void command::rc_in_cb_(const mavros_msgs::RCIn::ConstPtr& msg)
@@ -118,23 +119,26 @@ bool command::velocity()
     bool success = false;
     
     mav_manager::Vec4 main_channels;
-    //Deadzone
-   // for (int i =0; i<4; i++)
-   // {
-   //     if ((dshot_normalised[i] < 0.525) && (dshot_normalised[i]>0.475))
-   //     {
-  //          dshot_normalised[i] = 0.5;
-//	    std::cout << "In the deadzone: " << std::endl;
-//	    std::cout << "velocity setpoint: " << dshot_normalised[i] << std::endl;
- //       }
+//     Deadzone
+//    for (int i =0; i<4; i++)
+//    {
+//        if ((dshot_normalised[i] < 0.525) && (dshot_normalised[i]>0.475))
+//        {
+//            dshot_normalised[i] = 0.5;
+// 	    std::cout << "In the deadzone: " << std::endl;
+// 	    std::cout << "velocity setpoint: " << dshot_normalised[i] << std::endl;
+//        }
 //    }
     main_channels.request.goal[0] = dshot_normalised[1]; //Pitch
     main_channels.request.goal[1] = dshot_normalised[0]; //Roll
     main_channels.request.goal[2] = dshot_normalised[2]; //Throttle
     main_channels.request.goal[3] = dshot_normalised[3]; //Yaw
     //std::cout << "velocity setpoint: " << dshot_normalised[2] << std::endl;
+    
+    //Catch exception of service fail and then call
+    if(gotCalibration){ 
     vel_cmd.call(main_channels);
-
+    }
     return success;
     
 }
