@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <mavros_msgs/RCIn.h>
-#include <mav_manager/Vec4.h>
+#include <mav_manager_srv/Vec4.h>
 #include <std_srvs/SetBool.h>
 #include <std_srvs/Trigger.h>
 #include <mavros_msgs/ParamGet.h>
@@ -34,19 +34,20 @@ class command
 
 command::command()
 {
-    quadrotor =std::getenv("MAV_NAME");
-    rc_in_cb = nh.subscribe("/"+quadrotor+"/mavros/rc/in",1,&command::rc_in_cb_,this);
-    vel_cmd = nh.serviceClient<mav_manager::Vec4>("/"+quadrotor+"/mav_services/setDesVelInBodyFrame");
-    land_trigger = nh.serviceClient<std_srvs::Trigger>("/"+quadrotor+"/mav_services/land");
-    takeoff_trigger = nh.serviceClient<std_srvs::Trigger>("/"+quadrotor+"/mav_services/takeoff");
-    hover_trigger = nh.serviceClient<std_srvs::Trigger>("/"+quadrotor+"/mav_services/hover");
-    rc_calibration = nh.serviceClient<mavros_msgs::ParamGet>("/"+quadrotor+"/mavros/param/get");
-    Motors_on = nh.serviceClient<std_srvs::SetBool>("/"+quadrotor+"/mav_services/motors");
+    //quadrotor =std::getenv("MAV_NAME");
+    //ROS_INFO("MAV NAME is %s",quadrotor);
+    rc_in_cb = nh.subscribe("mavros/rc/in",1,&command::rc_in_cb_,this);
+    vel_cmd = nh.serviceClient<mav_manager_srv::Vec4>("mav_services/setDesVelInBodyFrame");
+    land_trigger = nh.serviceClient<std_srvs::Trigger>("mav_services/land");
+    takeoff_trigger = nh.serviceClient<std_srvs::Trigger>("mav_services/takeoff");
+    hover_trigger = nh.serviceClient<std_srvs::Trigger>("mav_services/hover");
+    rc_calibration = nh.serviceClient<mavros_msgs::ParamGet>("mavros/param/get");
+    Motors_on = nh.serviceClient<std_srvs::SetBool>("mav_services/motors");
     dshot_normalised[4] = {0.0};
     rc_channels[8] ={0};
     rc_mins[4] = {0};
     rc_max[4] = {0};
-    bool success = get_RC_Calibration();
+    //bool success = get_RC_Calibration();
     //motors = false;
 }
 void command::rc_in_cb_(const mavros_msgs::RCIn::ConstPtr& msg)
@@ -68,7 +69,8 @@ void command::rc_in_cb_(const mavros_msgs::RCIn::ConstPtr& msg)
     //Normalising DSHOT
     for (int i {0}; i < 4; i++)
     {
-        dshot_normalised[i] = scale*(static_cast<float>(rc_channels[i]) - 1500.00 )/(static_cast<float>(rc_max[i]) -static_cast<float>(rc_mins[i]));
+	//dshot_normalised[i] = scale*(static_cast<float>(rc_channels[i]) - 1500.00 )/(static_cast<float>(rc_max[i]) -static_cast<float>(rc_mins[i]));
+        dshot_normalised[i] = scale*(static_cast<float>(rc_channels[i]) - 1500.00 )/(static_cast<float>(1898) -static_cast<float>(1102));
     }
     
     static bool velocity_mode = false;
@@ -117,7 +119,7 @@ bool command::velocity()
 {
     bool success = false;
     
-    mav_manager::Vec4 main_channels;
+    mav_manager_srv::Vec4 main_channels;
     //Deadzone
    // for (int i =0; i<4; i++)
    // {
@@ -160,7 +162,7 @@ bool command::switch_on_motors()
 bool command::land()
 {
     bool success = false;
-    ROS_INFO("Landing");
+    ROS_WARN("Landing");
     std_srvs::Trigger trigger_land;
     try
     {
@@ -179,7 +181,7 @@ bool command::takeoff()
 {
     bool success = false;
     std_srvs::Trigger trigger_takeoff;
-    ROS_INFO("Taking off");
+    ROS_WARN("Taking off");
     try
     {
         takeoff_trigger.call(trigger_takeoff);
@@ -196,7 +198,7 @@ bool command::hover()
 {
     bool success = false;
     std_srvs::Trigger trigger_hover;
-    ROS_INFO("Hovering");
+    ROS_WARN("Hovering");
     try
     {
         hover_trigger.call(trigger_hover);
